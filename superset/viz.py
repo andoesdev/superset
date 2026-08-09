@@ -21,7 +21,6 @@ These objects represent the backend of all the visualizations that
 Superset can render.
 """
 import copy
-import inspect
 import logging
 import math
 import re
@@ -53,7 +52,7 @@ from flask_babel import lazy_gettext as _
 from geopy.point import Point
 from pandas.tseries.frequencies import to_offset
 
-from superset import app, db, is_feature_enabled
+from superset import app, is_feature_enabled
 from superset.constants import NULL_STRING
 from superset.errors import ErrorLevel, SupersetError, SupersetErrorType
 from superset.exceptions import (
@@ -63,7 +62,6 @@ from superset.exceptions import (
     SpatialException,
 )
 from superset.extensions import cache_manager, security_manager
-from superset.models.cache import CacheKey
 from superset.models.helpers import QueryResult
 from superset.typing import QueryObjectDict, VizData, VizPayload
 from superset.utils import core as utils
