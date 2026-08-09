@@ -59,7 +59,7 @@ def upgrade():
                 ["datasource_name"],
                 ["datasource_name"],
             )
-    except:
+    except Exception:
         logging.warning("Could not find or drop constraint on `columns`")
 
 
