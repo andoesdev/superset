@@ -17,7 +17,7 @@
 import hashlib
 import json
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from functools import wraps
 from typing import Any, Callable, Dict, Optional, Union
 
@@ -55,7 +55,7 @@ def set_and_log_cache(
 ) -> None:
     timeout = cache_timeout if cache_timeout else config["CACHE_DEFAULT_TIMEOUT"]
     try:
-        dttm = datetime.utcnow().isoformat().split(".")[0]
+        dttm = datetime.now(timezone.utc).replace(tzinfo=None).isoformat().split(".")[0]
         value = {**cache_value, "dttm": dttm}
         cache_instance.set(cache_key, value, timeout=timeout)
         stats_logger.incr("set_cache_key")
@@ -173,7 +173,7 @@ def etag_cache(
 
                 # add headers for caching: Last Modified, Expires and ETag
                 response.cache_control.public = True
-                response.last_modified = datetime.utcnow()
+                response.last_modified = datetime.now(timezone.utc).replace(tzinfo=None)
                 expiration = max_age or ONE_YEAR  # max_age=0 also means far future
                 response.expires = response.last_modified + timedelta(
                     seconds=expiration

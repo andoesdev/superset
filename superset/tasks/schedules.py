@@ -21,7 +21,7 @@ import logging
 import time
 import urllib.request
 from collections import namedtuple
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from email.utils import make_msgid, parseaddr
 from typing import (
     Any,
@@ -692,7 +692,7 @@ def evaluate_alert(
     logger.info("Processing alert ID: %i", alert_id)
 
     state = None
-    dttm_start = datetime.utcnow()
+    dttm_start = datetime.now(timezone.utc).replace(tzinfo=None)
 
     try:
         logger.info("Querying observers for alert <%s:%s>", alert_id, label)
@@ -705,7 +705,7 @@ def evaluate_alert(
         logging.exception(exc)
         logging.error("Failed at query observers for alert: %s (%s)", label, alert_id)
 
-    dttm_end = datetime.utcnow()
+    dttm_end = datetime.now(timezone.utc).replace(tzinfo=None)
 
     if state != AlertState.ERROR:
         # Don't validate alert on test runs since it may not be triggered
@@ -842,7 +842,7 @@ def schedule_hourly() -> None:
 def schedule_alerts() -> None:
     """ Celery beat job meant to be invoked every minute to check alerts """
     resolution = 0
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
     start_at = now - timedelta(
         seconds=3600
     )  # process any missed tasks in the past hour

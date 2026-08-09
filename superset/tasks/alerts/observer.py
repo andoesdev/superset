@@ -16,7 +16,7 @@
 # under the License.
 
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 import pandas as pd
@@ -49,7 +49,10 @@ def observe(alert_id: int, session: Session) -> Optional[str]:
         value = float(df.to_records()[0][1])
 
     observation = SQLObservation(
-        alert_id=alert_id, dttm=datetime.utcnow(), value=value, error_msg=error_msg,
+        alert_id=alert_id,
+        dttm=datetime.now(timezone.utc).replace(tzinfo=None),
+        value=value,
+        error_msg=error_msg,
     )
 
     session.add(observation)

@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any, List, Optional
 
 from flask_appbuilder.security.sqla.models import User
@@ -72,7 +72,7 @@ class BaseReportState:
         self._session = session
         self._report_schedule = report_schedule
         self._scheduled_dttm = scheduled_dttm
-        self._start_dttm = datetime.utcnow()
+        self._start_dttm = datetime.now(timezone.utc).replace(tzinfo=None)
 
     def set_state_and_log(
         self, state: ReportState, error_message: Optional[str] = None,
@@ -81,7 +81,7 @@ class BaseReportState:
         Updates current ReportSchedule state and TS. If on final state writes the log
         for this execution
         """
-        now_dttm = datetime.utcnow()
+        now_dttm = datetime.now(timezone.utc).replace(tzinfo=None)
         self.set_state(state, now_dttm)
         self.create_log(
             state, error_message=error_message,
@@ -106,7 +106,7 @@ class BaseReportState:
         log = ReportExecutionLog(
             scheduled_dttm=self._scheduled_dttm,
             start_dttm=self._start_dttm,
-            end_dttm=datetime.utcnow(),
+            end_dttm=datetime.now(timezone.utc).replace(tzinfo=None),
             value=self._report_schedule.last_value,
             value_row_json=self._report_schedule.last_value_row_json,
             state=state,
@@ -213,7 +213,7 @@ class BaseReportState:
         return (
             last_success is not None
             and self._report_schedule.grace_period
-            and datetime.utcnow()
+            and datetime.now(timezone.utc).replace(tzinfo=None)
             - timedelta(seconds=self._report_schedule.grace_period)
             < last_success.end_dttm
         )
@@ -225,7 +225,7 @@ class BaseReportState:
         return (
             self._report_schedule.working_timeout is not None
             and self._report_schedule.last_eval_dttm is not None
-            and datetime.utcnow()
+            and datetime.now(timezone.utc).replace(tzinfo=None)
             - timedelta(seconds=self._report_schedule.working_timeout)
             > self._report_schedule.last_eval_dttm
         )
