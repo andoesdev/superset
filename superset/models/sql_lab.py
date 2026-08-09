@@ -16,7 +16,7 @@
 # under the License.
 """A collection of ORM sqlalchemy models for SQL Lab"""
 import re
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any, Dict, List
 
 import simplejson as json
@@ -43,6 +43,7 @@ from superset.models.helpers import (
     AuditMixinNullable,
     ExtraJSONMixin,
     ImportExportMixin,
+    utcnow_naive,
 )
 from superset.models.tags import QueryUpdater
 from superset.sql_parse import CtasMethod, ParsedQuery, Table
@@ -96,10 +97,7 @@ class Query(Model, ExtraJSONMixin):
     tracking_url = Column(Text)
 
     changed_on = Column(
-        DateTime,
-        default=lambda: datetime.now(timezone.utc).replace(tzinfo=None),
-        onupdate=lambda: datetime.now(timezone.utc).replace(tzinfo=None),
-        nullable=True,
+        DateTime, default=utcnow_naive, onupdate=utcnow_naive, nullable=True
     )
 
     database = relationship(

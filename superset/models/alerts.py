@@ -17,7 +17,6 @@
 """Models for scheduled execution of jobs"""
 import json
 import textwrap
-from datetime import datetime, timezone
 from typing import Any, Optional
 
 from flask_appbuilder import Model
@@ -36,7 +35,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import backref, relationship, RelationshipProperty
 
 from superset import db, security_manager
-from superset.models.helpers import AuditMixinNullable
+from superset.models.helpers import AuditMixinNullable, utcnow_naive
 
 metadata = Model.metadata  # pylint: disable=no-member
 
@@ -77,9 +76,7 @@ class Alert(Model, AuditMixinNullable):
     dashboard_id = Column(Integer, ForeignKey("dashboards.id"))
     dashboard = relationship("Dashboard", backref="alert", foreign_keys=[dashboard_id])
 
-    last_eval_dttm = Column(
-        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
-    )
+    last_eval_dttm = Column(DateTime, default=utcnow_naive)
     last_state = Column(String(10))
 
     # Observation related columns
@@ -147,12 +144,8 @@ class AlertLog(Model):
 
     id = Column(Integer, primary_key=True)
     scheduled_dttm = Column(DateTime)
-    dttm_start = Column(
-        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
-    )
-    dttm_end = Column(
-        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
-    )
+    dttm_start = Column(DateTime, default=utcnow_naive)
+    dttm_end = Column(DateTime, default=utcnow_naive)
     alert_id = Column(Integer, ForeignKey("alerts.id"))
     alert = relationship("Alert", backref="logs", foreign_keys=[alert_id])
     state = Column(String(10))
@@ -171,11 +164,7 @@ class SQLObservation(Model):  # pylint: disable=too-few-public-methods
     __tablename__ = "sql_observations"
 
     id = Column(Integer, primary_key=True)
-    dttm = Column(
-        DateTime,
-        default=lambda: datetime.now(timezone.utc).replace(tzinfo=None),
-        index=True,
-    )
+    dttm = Column(DateTime, default=utcnow_naive, index=True)
     alert_id = Column(Integer, ForeignKey("alerts.id"))
     alert = relationship(
         "Alert",
