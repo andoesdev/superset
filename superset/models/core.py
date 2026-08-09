@@ -21,7 +21,6 @@ import logging
 import textwrap
 from contextlib import closing
 from copy import deepcopy
-from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Type
 
@@ -57,7 +56,7 @@ from sqlalchemy_utils import EncryptedType
 from superset import app, db_engine_specs, is_feature_enabled
 from superset.db_engine_specs.base import TimeGrain
 from superset.extensions import cache_manager, security_manager
-from superset.models.helpers import AuditMixinNullable, ImportExportMixin
+from superset.models.helpers import AuditMixinNullable, ImportExportMixin, utcnow_naive
 from superset.models.tags import FavStarUpdater
 from superset.result_set import SupersetResultSet
 from superset.utils import cache as cache_util, core as utils
@@ -710,9 +709,7 @@ class Log(Model):  # pylint: disable=too-few-public-methods
     user = relationship(
         security_manager.user_model, backref="logs", foreign_keys=[user_id]
     )
-    dttm = Column(
-        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
-    )
+    dttm = Column(DateTime, default=utcnow_naive)
     duration_ms = Column(Integer)
     referrer = Column(String(1024))
 
@@ -729,9 +726,7 @@ class FavStar(Model):  # pylint: disable=too-few-public-methods
     user_id = Column(Integer, ForeignKey("ab_user.id"))
     class_name = Column(String(50))
     obj_id = Column(Integer)
-    dttm = Column(
-        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
-    )
+    dttm = Column(DateTime, default=utcnow_naive)
 
 
 # events for updating tags

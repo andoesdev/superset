@@ -88,6 +88,7 @@ except ImportError:
     pass
 
 IS_SIP_38 = is_feature_enabled("SIP_38_VIZ_REARCHITECTURE")
+DRUID_REQUEST_TIMEOUT = 60
 DRUID_TZ = conf.get("DRUID_TZ")
 POST_AGG_TYPE = "postagg"
 metadata = Model.metadata  # pylint: disable=no-member
@@ -115,9 +116,6 @@ try:
 
 except NameError:
     pass
-
-DRUID_REQUEST_TIMEOUT_SECONDS = 60
-
 
 # Function wrapper because bound methods cannot
 # be passed to processes
@@ -189,18 +187,14 @@ class DruidCluster(Model, AuditMixinNullable, ImportExportMixin):
         endpoint = self.get_base_broker_url() + "/datasources"
         auth = requests.auth.HTTPBasicAuth(self.broker_user, self.broker_pass)
         return json.loads(
-            requests.get(
-                endpoint, auth=auth, timeout=DRUID_REQUEST_TIMEOUT_SECONDS
-            ).text
+            requests.get(endpoint, auth=auth, timeout=DRUID_REQUEST_TIMEOUT).text
         )
 
     def get_druid_version(self) -> str:
         endpoint = self.get_base_url(self.broker_host, self.broker_port) + "/status"
         auth = requests.auth.HTTPBasicAuth(self.broker_user, self.broker_pass)
         return json.loads(
-            requests.get(
-                endpoint, auth=auth, timeout=DRUID_REQUEST_TIMEOUT_SECONDS
-            ).text
+            requests.get(endpoint, auth=auth, timeout=DRUID_REQUEST_TIMEOUT).text
         )["version"]
 
     @property  # type: ignore
