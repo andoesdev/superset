@@ -42,7 +42,6 @@ class DatasourceModelView(SupersetModelView):
             raise SupersetException(
                 Markup(
                     "Cannot delete a datasource that has slices attached to it."
-                    "Here's the list of associated charts: "
-                    + "".join([i.slice_name for i in item.slices])
-                )
+                    "Here's the list of associated charts: {}"
+                ).format("".join([i.slice_name for i in item.slices]))
             )
