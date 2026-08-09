@@ -42,7 +42,7 @@ def json_dumps(obj: Any, sort_keys: bool = False) -> str:
 
 def generate_cache_key(values_dict: Dict[str, Any], key_prefix: str = "") -> str:
     json_data = json_dumps(values_dict, sort_keys=True)
-    hash_str = hashlib.md5(json_data.encode("utf-8")).hexdigest()
+    hash_str = hashlib.sha256(json_data.encode("utf-8")).hexdigest()
     return f"{key_prefix}{hash_str}"
 
 
