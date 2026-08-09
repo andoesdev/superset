@@ -23,7 +23,6 @@ import json
 
 import sqlalchemy as sa
 from alembic import op
-from flask_appbuilder.models.mixins import AuditMixin
 from sqlalchemy.ext.declarative import declarative_base
 
 from superset import db
@@ -50,7 +49,7 @@ def upgrade():
 
     dashboards = session.query(Dashboard).all()
     for i, dashboard in enumerate(dashboards):
-        print("Upgrading ({}/{}): {}".format(i, len(dashboards), dashboard.id))
+        print(f"Upgrading ({i}/{len(dashboards)}): {dashboard.id}")
         positions = json.loads(dashboard.position_json or "{}")
         for pos in positions:
             if pos.get("v", 0) == 0:
@@ -73,7 +72,7 @@ def downgrade():
 
     dashboards = session.query(Dashboard).all()
     for i, dashboard in enumerate(dashboards):
-        print("Downgrading ({}/{}): {}".format(i, len(dashboards), dashboard.id))
+        print(f"Downgrading ({i}/{len(dashboards)}): {dashboard.id}")
         positions = json.loads(dashboard.position_json or "{}")
         for pos in positions:
             if pos.get("v", 0) == 1:
@@ -86,4 +85,3 @@ def downgrade():
         dashboard.position_json = json.dumps(positions, indent=2)
         session.merge(dashboard)
         session.commit()
-    pass
