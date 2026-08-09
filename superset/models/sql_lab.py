@@ -16,7 +16,7 @@
 # under the License.
 """A collection of ORM sqlalchemy models for SQL Lab"""
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 import simplejson as json
@@ -96,7 +96,10 @@ class Query(Model, ExtraJSONMixin):
     tracking_url = Column(Text)
 
     changed_on = Column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=True
+        DateTime,
+        default=lambda: datetime.now(timezone.utc).replace(tzinfo=None),
+        onupdate=lambda: datetime.now(timezone.utc).replace(tzinfo=None),
+        nullable=True,
     )
 
     database = relationship(

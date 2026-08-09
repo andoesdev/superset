@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Optional
 from unittest.mock import patch
 
@@ -449,7 +449,8 @@ def test_email_chart_report_schedule(
 
     with freeze_time("2020-01-01T00:00:00Z"):
         AsyncExecuteReportScheduleCommand(
-            create_report_email_chart.id, datetime.utcnow()
+            create_report_email_chart.id,
+            datetime.now(timezone.utc).replace(tzinfo=None),
         ).run()
 
         notification_targets = get_target_from_report_schedule(
@@ -485,7 +486,8 @@ def test_email_dashboard_report_schedule(
 
     with freeze_time("2020-01-01T00:00:00Z"):
         AsyncExecuteReportScheduleCommand(
-            create_report_email_dashboard.id, datetime.utcnow()
+            create_report_email_dashboard.id,
+            datetime.now(timezone.utc).replace(tzinfo=None),
         ).run()
 
         notification_targets = get_target_from_report_schedule(
@@ -515,7 +517,8 @@ def test_slack_chart_report_schedule(
 
     with freeze_time("2020-01-01T00:00:00Z"):
         AsyncExecuteReportScheduleCommand(
-            create_report_slack_chart.id, datetime.utcnow()
+            create_report_slack_chart.id,
+            datetime.now(timezone.utc).replace(tzinfo=None),
         ).run()
 
         notification_targets = get_target_from_report_schedule(
@@ -535,7 +538,9 @@ def test_report_schedule_not_found(create_report_slack_chart):
     """
     max_id = db.session.query(func.max(ReportSchedule.id)).scalar()
     with pytest.raises(ReportScheduleNotFoundError):
-        AsyncExecuteReportScheduleCommand(max_id + 1, datetime.utcnow()).run()
+        AsyncExecuteReportScheduleCommand(
+            max_id + 1, datetime.now(timezone.utc).replace(tzinfo=None)
+        ).run()
 
 
 @pytest.mark.usefixtures("create_report_slack_chart_working")
@@ -547,7 +552,8 @@ def test_report_schedule_working(create_report_slack_chart_working):
     with freeze_time("2020-01-01T00:00:00Z"):
         with pytest.raises(ReportSchedulePreviousWorkingError):
             AsyncExecuteReportScheduleCommand(
-                create_report_slack_chart_working.id, datetime.utcnow()
+                create_report_slack_chart_working.id,
+                datetime.now(timezone.utc).replace(tzinfo=None),
             ).run()
 
         assert_log(
@@ -570,7 +576,8 @@ def test_report_schedule_working_timeout(create_report_slack_chart_working):
     with freeze_time(current_time):
         with pytest.raises(ReportScheduleWorkingTimeoutError):
             AsyncExecuteReportScheduleCommand(
-                create_report_slack_chart_working.id, datetime.utcnow()
+                create_report_slack_chart_working.id,
+                datetime.now(timezone.utc).replace(tzinfo=None),
             ).run()
 
     # Only needed for MySQL, understand why
@@ -595,7 +602,8 @@ def test_report_schedule_success_grace(create_alert_slack_chart_success):
 
     with freeze_time(current_time):
         AsyncExecuteReportScheduleCommand(
-            create_alert_slack_chart_success.id, datetime.utcnow()
+            create_alert_slack_chart_success.id,
+            datetime.now(timezone.utc).replace(tzinfo=None),
         ).run()
 
     db.session.commit()
@@ -614,7 +622,8 @@ def test_report_schedule_success_grace_end(create_alert_slack_chart_grace):
 
     with freeze_time(current_time):
         AsyncExecuteReportScheduleCommand(
-            create_alert_slack_chart_grace.id, datetime.utcnow()
+            create_alert_slack_chart_grace.id,
+            datetime.now(timezone.utc).replace(tzinfo=None),
         ).run()
 
     db.session.commit()
@@ -639,7 +648,8 @@ def test_email_dashboard_report_fails(
 
     with pytest.raises(ReportScheduleNotificationError):
         AsyncExecuteReportScheduleCommand(
-            create_report_email_dashboard.id, datetime.utcnow()
+            create_report_email_dashboard.id,
+            datetime.now(timezone.utc).replace(tzinfo=None),
         ).run()
 
     assert_log(ReportState.ERROR, error_message="Could not connect to SMTP XPTO")
@@ -658,7 +668,7 @@ def test_slack_chart_alert(screenshot_mock, email_mock, create_alert_email_chart
 
     with freeze_time("2020-01-01T00:00:00Z"):
         AsyncExecuteReportScheduleCommand(
-            create_alert_email_chart.id, datetime.utcnow()
+            create_alert_email_chart.id, datetime.now(timezone.utc).replace(tzinfo=None)
         ).run()
 
         notification_targets = get_target_from_report_schedule(create_alert_email_chart)
@@ -678,7 +688,8 @@ def test_email_chart_no_alert(create_no_alert_email_chart):
     """
     with freeze_time("2020-01-01T00:00:00Z"):
         AsyncExecuteReportScheduleCommand(
-            create_no_alert_email_chart.id, datetime.utcnow()
+            create_no_alert_email_chart.id,
+            datetime.now(timezone.utc).replace(tzinfo=None),
         ).run()
     assert_log(ReportState.NOOP)
 
@@ -693,7 +704,8 @@ def test_email_mul_alert(create_mul_alert_email_chart):
             (AlertQueryMultipleRowsError, AlertQueryMultipleColumnsError)
         ):
             AsyncExecuteReportScheduleCommand(
-                create_mul_alert_email_chart.id, datetime.utcnow()
+                create_mul_alert_email_chart.id,
+                datetime.now(timezone.utc).replace(tzinfo=None),
             ).run()
 
 
@@ -705,5 +717,6 @@ def test_invalid_sql_alert(create_invalid_sql_alert_email_chart):
     with freeze_time("2020-01-01T00:00:00Z"):
         with pytest.raises((AlertQueryError, AlertQueryInvalidTypeError)):
             AsyncExecuteReportScheduleCommand(
-                create_invalid_sql_alert_email_chart.id, datetime.utcnow()
+                create_invalid_sql_alert_email_chart.id,
+                datetime.now(timezone.utc).replace(tzinfo=None),
             ).run()

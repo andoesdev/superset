@@ -17,7 +17,7 @@
 """Models for scheduled execution of jobs"""
 import json
 import textwrap
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Optional
 
 from flask_appbuilder import Model
@@ -77,7 +77,9 @@ class Alert(Model, AuditMixinNullable):
     dashboard_id = Column(Integer, ForeignKey("dashboards.id"))
     dashboard = relationship("Dashboard", backref="alert", foreign_keys=[dashboard_id])
 
-    last_eval_dttm = Column(DateTime, default=datetime.utcnow)
+    last_eval_dttm = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
     last_state = Column(String(10))
 
     # Observation related columns
@@ -145,8 +147,12 @@ class AlertLog(Model):
 
     id = Column(Integer, primary_key=True)
     scheduled_dttm = Column(DateTime)
-    dttm_start = Column(DateTime, default=datetime.utcnow)
-    dttm_end = Column(DateTime, default=datetime.utcnow)
+    dttm_start = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
+    dttm_end = Column(
+        DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
+    )
     alert_id = Column(Integer, ForeignKey("alerts.id"))
     alert = relationship("Alert", backref="logs", foreign_keys=[alert_id])
     state = Column(String(10))
@@ -165,7 +171,11 @@ class SQLObservation(Model):  # pylint: disable=too-few-public-methods
     __tablename__ = "sql_observations"
 
     id = Column(Integer, primary_key=True)
-    dttm = Column(DateTime, default=datetime.utcnow, index=True)
+    dttm = Column(
+        DateTime,
+        default=lambda: datetime.now(timezone.utc).replace(tzinfo=None),
+        index=True,
+    )
     alert_id = Column(Integer, ForeignKey("alerts.id"))
     alert = relationship(
         "Alert",
