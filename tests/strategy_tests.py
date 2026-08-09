@@ -43,7 +43,7 @@ from .base_tests import SupersetTestCase
 from .dashboard_utils import create_dashboard, create_slice, create_table_for_dashboard
 from .fixtures.unicode_dashboard import load_unicode_dashboard_with_slice
 
-URL_PREFIX = "http://0.0.0.0:8081"
+URL_PREFIX = "http://127.0.0.1:8081"
 
 mock_positions = {
     "DASHBOARD_VERSION_KEY": "v2",
