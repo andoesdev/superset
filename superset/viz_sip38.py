@@ -29,7 +29,7 @@ import math
 import re
 import uuid
 from collections import defaultdict, OrderedDict
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from itertools import product
 from typing import Any, Dict, List, Optional, Set, Tuple, TYPE_CHECKING
 
@@ -478,7 +478,9 @@ class BaseViz:
         is_loaded = False
         stacktrace = None
         df = None
-        cached_dttm = datetime.utcnow().isoformat().split(".")[0]
+        cached_dttm = (
+            datetime.now(timezone.utc).replace(tzinfo=None).isoformat().split(".")[0]
+        )
         if cache_key and cache_manager.data_cache and not self.force:
             cache_value = cache_manager.data_cache.get(cache_key)
             if cache_value:

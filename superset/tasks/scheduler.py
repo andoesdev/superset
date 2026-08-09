@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Iterator
 
 import croniter
@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 def cron_schedule_window(cron: str) -> Iterator[datetime]:
     window_size = app.config["ALERT_REPORTS_CRON_WINDOW_SIZE"]
-    utc_now = datetime.utcnow()
+    utc_now = datetime.now(timezone.utc).replace(tzinfo=None)
     start_at = utc_now - timedelta(seconds=1)
     stop_at = utc_now + timedelta(seconds=window_size)
     crons = croniter.croniter(cron, start_at)
