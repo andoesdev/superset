@@ -14,19 +14,19 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-import urllib
 from typing import Any
+from urllib.parse import urljoin
 
 from flask import current_app, url_for
 
 
 def headless_url(path: str, user_friendly: bool = False) -> str:
-    base_url = (
+    base_url: str = (
         current_app.config["WEBDRIVER_BASEURL_USER_FRIENDLY"]
         if user_friendly
         else current_app.config["WEBDRIVER_BASEURL"]
     )
-    return urllib.parse.urljoin(base_url, path)
+    return urljoin(base_url, path)
 
 
 def get_url_path(view: str, user_friendly: bool = False, **kwargs: Any) -> str:
