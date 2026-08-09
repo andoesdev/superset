@@ -109,7 +109,13 @@ class BigQueryEngineSpec(BaseEngineSpec):
         :param label: Expected expression label
         :return: Conditionally mutated label
         """
-        label_hashed = "_" + hashlib.md5(label.encode("utf-8")).hexdigest()
+        # md5 is used here only to derive a short, stable suffix that keeps
+        # mutated labels unique; it is not used for any security purpose. The
+        # `usedforsecurity=False` flag requires Python 3.9+, while this package
+        # still supports Python 3.7, hence the explicit nosec.
+        label_hashed = (
+            "_" + hashlib.md5(label.encode("utf-8")).hexdigest()  # nosec B324
+        )
 
         # if label starts with number, add underscore as first character
         label_mutated = "_" + label if re.match(r"^\d", label) else label
