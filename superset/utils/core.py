@@ -18,7 +18,6 @@
 import decimal
 import errno
 import functools
-import hashlib
 import json
 import logging
 import os
@@ -87,6 +86,7 @@ from superset.exceptions import (
 )
 from superset.typing import FlaskResponse, FormData, Metric
 from superset.utils.dates import datetime_to_epoch, EPOCH
+from superset.utils.hashing import md5_sha_from_str
 
 try:
     from pydruid.utils.having import Having
@@ -428,7 +428,7 @@ def list_minus(l: List[Any], minus: List[Any]) -> List[Any]:
 
 
 def md5_hex(data: str) -> str:
-    return hashlib.md5(data.encode()).hexdigest()
+    return md5_sha_from_str(data)
 
 
 class DashboardEncoder(json.JSONEncoder):
@@ -1261,7 +1261,7 @@ def create_ssl_cert_file(certificate: str) -> str:
     :return: The path to the certificate file
     :raises CertificateException: If certificate is not valid/unparseable
     """
-    filename = f"{hashlib.md5(certificate.encode('utf-8')).hexdigest()}.crt"
+    filename = f"{md5_sha_from_str(certificate)}.crt"
     cert_dir = current_app.config["SSL_CERT_PATH"]
     path = cert_dir if cert_dir else tempfile.gettempdir()
     path = os.path.join(path, filename)
