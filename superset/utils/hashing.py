@@ -16,11 +16,21 @@
 # under the License.
 import hashlib
 import json
+import sys
 from typing import Any, Dict
 
+if sys.version_info >= (3, 9):
 
-def md5_sha_from_str(val: str) -> str:
-    return hashlib.md5(val.encode("utf-8")).hexdigest()
+    def md5_sha_from_str(val: str) -> str:
+        # MD5 is used to derive deterministic identifiers, not for security
+        return hashlib.md5(val.encode("utf-8"), usedforsecurity=False).hexdigest()
+
+
+else:
+
+    def md5_sha_from_str(val: str) -> str:
+        # MD5 is used to derive deterministic identifiers, not for security
+        return hashlib.md5(val.encode("utf-8")).hexdigest()  # nosec: B324
 
 
 def md5_sha_from_dict(opts: Dict[Any, Any]) -> str:
