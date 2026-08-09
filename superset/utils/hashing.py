@@ -14,13 +14,23 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
+import functools
 import hashlib
 import json
+import sys
 from typing import Any, Dict
+
+# These hashes are used for cache keys and fingerprints only, never for security.
+# The ``usedforsecurity`` flag is only supported from Python 3.9 onwards.
+_md5 = (
+    functools.partial(hashlib.md5, usedforsecurity=False)
+    if sys.version_info >= (3, 9)
+    else hashlib.md5
+)
 
 
 def md5_sha_from_str(val: str) -> str:
-    return hashlib.md5(val.encode("utf-8")).hexdigest()
+    return _md5(val.encode("utf-8")).hexdigest()
 
 
 def md5_sha_from_dict(opts: Dict[Any, Any]) -> str:

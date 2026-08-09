@@ -15,7 +15,6 @@
 # specific language governing permissions and limitations
 # under the License.
 # pylint: disable=R
-import hashlib
 import logging
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, NamedTuple, Optional, Union
@@ -30,6 +29,7 @@ from superset.typing import Metric
 from superset.utils import pandas_postprocessing
 from superset.utils.core import DTTM_ALIAS, get_metric_names, json_int_dttm_ser
 from superset.utils.date_parser import get_since_until, parse_human_timedelta
+from superset.utils.hashing import md5_sha_from_str
 from superset.views.utils import get_time_range_endpoints
 
 config = app.config
@@ -276,7 +276,7 @@ class QueryObject:
             cache_dict["annotation_layers"] = annotation_layers
 
         json_data = self.json_dumps(cache_dict, sort_keys=True)
-        return hashlib.md5(json_data.encode("utf-8")).hexdigest()
+        return md5_sha_from_str(json_data)
 
     @staticmethod
     def json_dumps(obj: Any, sort_keys: bool = False) -> str:
