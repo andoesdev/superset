@@ -276,7 +276,7 @@ class QueryObject:
             cache_dict["annotation_layers"] = annotation_layers
 
         json_data = self.json_dumps(cache_dict, sort_keys=True)
-        return hashlib.md5(json_data.encode("utf-8")).hexdigest()
+        return hashlib.sha256(json_data.encode("utf-8")).hexdigest()
 
     @staticmethod
     def json_dumps(obj: Any, sort_keys: bool = False) -> str:
