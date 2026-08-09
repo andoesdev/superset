@@ -44,12 +44,15 @@ from typing_extensions import Literal
 github_token = os.environ.get("GITHUB_TOKEN")
 github_repo = os.environ.get("GITHUB_REPOSITORY", "apache/incubator-superset")
 
+REQUEST_TIMEOUT = 60
+
 
 def request(method: Literal["GET", "POST", "DELETE", "PUT"], endpoint: str, **kwargs):
     resp = requests.request(
         method,
         f"https://api.github.com/{endpoint.lstrip('/')}",
         headers={"Authorization": f"Bearer {github_token}"},
+        timeout=REQUEST_TIMEOUT,
         **kwargs,
     ).json()
     if "message" in resp:
