@@ -22,7 +22,6 @@ Superset can render.
 """
 # mypy: ignore-errors
 import copy
-import hashlib
 import inspect
 import logging
 import math
@@ -64,6 +63,7 @@ from superset.utils.core import (
     to_adhoc,
 )
 from superset.utils.date_parser import get_since_until, parse_past_timedelta
+from superset.utils.hashing import md5_sha_from_str
 
 import dataclasses  # isort:skip
 
@@ -453,7 +453,7 @@ class BaseViz:
         )
         cache_dict["changed_on"] = self.datasource.changed_on
         json_data = self.json_dumps(cache_dict, sort_keys=True)
-        return hashlib.md5(json_data.encode("utf-8")).hexdigest()
+        return md5_sha_from_str(json_data)
 
     def get_payload(self, query_obj: Optional[QueryObjectDict] = None) -> VizPayload:
         """Returns a payload of metadata and data"""
