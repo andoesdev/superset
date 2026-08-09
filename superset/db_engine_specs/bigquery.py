@@ -131,7 +131,11 @@ class BigQueryEngineSpec(BaseEngineSpec):
         :param label: expected expression label
         :return: truncated label
         """
-        return "_" + hashlib.md5(label.encode("utf-8")).hexdigest()
+        # md5 is used here only to derive a deterministic, collision-resistant
+        # column name; it is not used for any security purpose. The
+        # `usedforsecurity` keyword is unavailable on the Python versions this
+        # project supports (< 3.9), hence the explicit nosec marker.
+        return "_" + hashlib.md5(label.encode("utf-8")).hexdigest()  # nosec B324
 
     @classmethod
     def normalize_indexes(cls, indexes: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
