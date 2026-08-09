@@ -116,6 +116,9 @@ try:
 except NameError:
     pass
 
+DRUID_REQUEST_TIMEOUT_SECONDS = 60
+
+
 # Function wrapper because bound methods cannot
 # be passed to processes
 def _fetch_metadata_for(datasource: "DruidDatasource") -> Optional[Dict[str, Any]]:
@@ -185,12 +188,20 @@ class DruidCluster(Model, AuditMixinNullable, ImportExportMixin):
     def get_datasources(self) -> List[str]:
         endpoint = self.get_base_broker_url() + "/datasources"
         auth = requests.auth.HTTPBasicAuth(self.broker_user, self.broker_pass)
-        return json.loads(requests.get(endpoint, auth=auth).text)
+        return json.loads(
+            requests.get(
+                endpoint, auth=auth, timeout=DRUID_REQUEST_TIMEOUT_SECONDS
+            ).text
+        )
 
     def get_druid_version(self) -> str:
         endpoint = self.get_base_url(self.broker_host, self.broker_port) + "/status"
         auth = requests.auth.HTTPBasicAuth(self.broker_user, self.broker_pass)
-        return json.loads(requests.get(endpoint, auth=auth).text)["version"]
+        return json.loads(
+            requests.get(
+                endpoint, auth=auth, timeout=DRUID_REQUEST_TIMEOUT_SECONDS
+            ).text
+        )["version"]
 
     @property  # type: ignore
     @utils.memoized
