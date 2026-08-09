@@ -980,7 +980,10 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         :param label: Expected expression label
         :return: Truncated label
         """
-        label = hashlib.md5(label.encode("utf-8")).hexdigest()
+        # md5 is not used for any security purpose here, only to derive a
+        # deterministic and unique alias for a column label. Python 3.7/3.8 are
+        # still supported, so the `usedforsecurity=False` flag is unavailable.
+        label = hashlib.md5(label.encode("utf-8")).hexdigest()  # nosec B324
         # truncate hash if it exceeds max length
         if cls.max_column_name_length and len(label) > cls.max_column_name_length:
             label = label[: cls.max_column_name_length]
