@@ -604,7 +604,6 @@ class Database(
             table_name,
             meta,
             schema=schema or None,
-            autoload=True,
             autoload_with=self.get_sqla_engine(),
         )
 
