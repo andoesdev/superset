@@ -19,7 +19,7 @@ import json
 import logging
 import re
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from json.decoder import JSONDecodeError
 from typing import Any, Dict, List, Optional, Set, Union
 
@@ -41,6 +41,11 @@ from sqlalchemy_utils import UUIDType
 from superset.utils.core import QueryStatus
 
 logger = logging.getLogger(__name__)
+
+
+def utcnow_naive() -> datetime:
+    """Current UTC time as a naive datetime, as stored in timestamp columns"""
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 def json_to_dict(json_str: str) -> Dict[Any, Any]:
