@@ -604,21 +604,22 @@ def flower(port: int, address: str) -> None:
     Celery Flower is a UI to monitor the Celery operation on a given
     broker"""
     broker_url = celery_app.conf.BROKER_URL
-    cmd = (
-        "celery flower "
-        f"--broker={broker_url} "
-        f"--port={port} "
-        f"--address={address} "
-    )
+    cmd = [
+        "celery",
+        "flower",
+        f"--broker={broker_url}",
+        f"--port={port}",
+        f"--address={address}",
+    ]
     logger.info(
         "The 'superset flower' command is deprecated. Please use the 'celery "
         "flower' command instead."
     )
     print(Fore.GREEN + "Starting a Celery Flower instance")
     print(Fore.BLUE + "-=" * 40)
-    print(Fore.YELLOW + cmd)
+    print(Fore.YELLOW + " ".join(cmd))
     print(Fore.BLUE + "-=" * 40)
-    Popen(cmd, shell=True).wait()
+    Popen(cmd).wait()
 
 
 @superset.command()
